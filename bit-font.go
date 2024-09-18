@@ -119,6 +119,35 @@ func (BitFontOptions) Range(offset int, low rune, high ...rune) BitFontOpt {
 	}
 }
 
+func (BitFontOptions) AddRune(offset int, r rune) BitFontOpt {
+	return func(u *BitFont) {
+		u.ranges = append(u.ranges, basicfont.Range{
+			Offset: offset,
+			Low:    r,
+			High:   r + 1,
+		})
+	}
+}
+
+func (BitFontOptions) AddString(offset int, s string, height ...int) BitFontOpt {
+	return func(u *BitFont) {
+		var h = u.Height
+		if len(height) > 0 {
+			if h1 := height[0]; h1 > 0 {
+				h = h1
+			}
+		}
+
+		for i, r := range s {
+			u.ranges = append(u.ranges, basicfont.Range{
+				Offset: offset + i*h,
+				Low:    r,
+				High:   r + 1,
+			})
+		}
+	}
+}
+
 func (BitFontOptions) Size(w, h int) BitFontOpt {
 	return func(u *BitFont) {
 		u.Width = w
